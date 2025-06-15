@@ -1,4 +1,4 @@
-import { connect } from "mongoose";
+import {connect} from 'mongoose';
 
 /** Connects the application with mongo database */
 export default function connectDB() {
