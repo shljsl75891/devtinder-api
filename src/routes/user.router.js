@@ -1,34 +1,15 @@
 import bcrypt from 'bcrypt';
 import {Router} from 'express';
+import {SALT_ROUNDS} from '../constants.js';
 import User from '../models/user.model.js';
 import {STATUS_CODES} from '../status-codes.js';
-import {
-  validateUserSignup,
-  validateUserUpdate,
-} from '../utils/validations/user.validation.js';
+import {validateUserUpdate} from '../utils/index.js';
 
 const userRouter = Router();
-const SALT_ROUNDS = 10;
-
-userRouter.post('/signup', async (req, res) => {
-  try {
-    validateUserSignup(req.body);
-    const {firstName, lastName, email, password} = req.body;
-    const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-    const savedUser = await User.create({
-      firstName,
-      lastName,
-      email,
-      password: passwordHash,
-    });
-    res.status(STATUS_CODES.CREATED).json(savedUser);
-  } catch (err) {
-    res.status(STATUS_CODES.UNPROCESSABLE_ENTITY).send({message: err.message});
-  }
-});
 
 userRouter.get('/', async (req, res) => {
-  const users = await User.find();
+  const EXPOSABLE_FIELDS = 'firstName lastName email profileImageUrl skills';
+  const users = await User.find({}, EXPOSABLE_FIELDS);
   res.status(STATUS_CODES.OK).json(users);
 });
 

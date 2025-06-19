@@ -1,6 +1,7 @@
 import express from 'express';
 import connectDB from './config/database.js';
 import './config/environment.js';
+import authRouter from './routes/auth.router.js';
 import userRouter from './routes/user.router.js';
 import {STATUS_CODES} from './status-codes.js';
 
@@ -11,6 +12,7 @@ const PORT = +(process.env.PORT ?? 3400);
 app.use(express.json());
 
 // Routes
+app.use('/auth', authRouter);
 app.use('/users', userRouter);
 
 // Error Handling
