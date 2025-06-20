@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import {FIVE_MINUTES, SALT_ROUNDS} from '../constants.js';
+import {FIVE_MINUTES_IN_MILLISECONDS, SALT_ROUNDS} from '../constants.js';
 import User from '../models/user.model.js';
 import {STATUS_CODES} from '../status-codes.js';
 import {validateUserLogin, validateUserSignup} from '../utils/index.js';
@@ -17,9 +17,13 @@ authRouter.post('/login', async (req, res) => {
     if (!user) throw INVALID_CREDENTIALS_ERROR;
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (isPasswordCorrect) {
-      res.cookie('token', jwt.sign({_id: user._id}, process.env.JWT_SECRET), {
-        expires: new Date(Date.now() + FIVE_MINUTES),
-      });
+      res.cookie(
+        'token',
+        jwt.sign({_id: user._id}, process.env.JWT_SECRET, {
+          expiresIn: FIVE_MINUTES_IN_MILLISECONDS / 1000,
+        }),
+        {expires: new Date(Date.now() + FIVE_MINUTES_IN_MILLISECONDS)},
+      );
       res
         .status(STATUS_CODES.OK)
         .json({message: 'You have login successfully'});

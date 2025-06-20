@@ -4,30 +4,27 @@ import {SALT_ROUNDS} from '../constants.js';
 import userAuth from '../middlewares/auth.middleware.js';
 import User from '../models/user.model.js';
 import {STATUS_CODES} from '../status-codes.js';
-import {validateUserUpdate} from '../utils/index.js';
+import {validateProfileUpdate} from '../utils/index.js';
 
 const userRouter = Router();
 userRouter.use(userAuth);
 
-userRouter.get('/', async (req, res) => {
+userRouter.get('/feed', async (req, res) => {
   const users = await User.find({}, {__v: 0, password: 0});
   res.status(STATUS_CODES.OK).json(users);
 });
 
-userRouter.get('/:id', async (req, res) => {
-  const user = await User.findById(req.params.id, {__v: 0, password: 0});
-  if (!user)
-    res.status(STATUS_CODES.NOT_FOUND).json({message: 'User Not Found'});
-  else res.status(STATUS_CODES.OK).json(user);
+userRouter.get('/profile', async (req, res) => {
+  res.status(STATUS_CODES.OK).json(res.locals.currentUser);
 });
 
-userRouter.patch('/:id', async (req, res) => {
+userRouter.patch('/update-profile', async (req, res) => {
   try {
-    validateUserUpdate(req.body);
+    validateProfileUpdate(req.body);
     const {profileImageUrl, password, skills} = req.body;
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
     const user = await User.findByIdAndUpdate(
-      req.params.id,
+      res.locals.currentUser._id,
       {profileImageUrl, password: passwordHash, skills},
       {runValidators: true},
     );
@@ -39,8 +36,8 @@ userRouter.patch('/:id', async (req, res) => {
   }
 });
 
-userRouter.delete('/:id', async (req, res) => {
-  const user = await User.findByIdAndDelete(req.params.id);
+userRouter.delete('/delete-account', async (req, res) => {
+  const user = await User.findByIdAndDelete(res.locals.currentUser._id);
   if (!user)
     res.status(STATUS_CODES.NOT_FOUND).json({message: 'User Not Found'});
   else res.sendStatus(STATUS_CODES.NO_CONTENT);
