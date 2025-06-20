@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import {FIVE_MINUTES_IN_MILLISECONDS, SALT_ROUNDS} from '../constants.js';
+import {HALF_HOUR_IN_MILLISECONDS, SALT_ROUNDS} from '../constants.js';
 import User from '../models/user.model.js';
 import {STATUS_CODES} from '../status-codes.js';
 import {validateUserLogin, validateUserSignup} from '../utils/index.js';
@@ -20,9 +20,10 @@ authRouter.post('/login', async (req, res) => {
       res.cookie(
         'token',
         jwt.sign({_id: user._id}, process.env.JWT_SECRET, {
-          expiresIn: FIVE_MINUTES_IN_MILLISECONDS / 1000,
+          expiresIn: HALF_HOUR_IN_MILLISECONDS / 1000,
         }),
-        {expires: new Date(Date.now() + FIVE_MINUTES_IN_MILLISECONDS)},
+        // Expires the cookie one minute before JWT get expired
+        {expires: new Date(Date.now() + HALF_HOUR_IN_MILLISECONDS - 60000)},
       );
       res
         .status(STATUS_CODES.OK)
