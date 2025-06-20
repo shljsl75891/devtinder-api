@@ -1,20 +1,21 @@
 import bcrypt from 'bcrypt';
 import {Router} from 'express';
 import {SALT_ROUNDS} from '../constants.js';
+import userAuth from '../middlewares/auth.middleware.js';
 import User from '../models/user.model.js';
 import {STATUS_CODES} from '../status-codes.js';
 import {validateUserUpdate} from '../utils/index.js';
 
 const userRouter = Router();
+userRouter.use(userAuth);
 
 userRouter.get('/', async (req, res) => {
-  const EXPOSABLE_FIELDS = 'firstName lastName email profileImageUrl skills';
-  const users = await User.find({}, EXPOSABLE_FIELDS);
+  const users = await User.find({}, {__v: 0, password: 0});
   res.status(STATUS_CODES.OK).json(users);
 });
 
 userRouter.get('/:id', async (req, res) => {
-  const user = await User.findById(req.params.id);
+  const user = await User.findById(req.params.id, {__v: 0, password: 0});
   if (!user)
     res.status(STATUS_CODES.NOT_FOUND).json({message: 'User Not Found'});
   else res.status(STATUS_CODES.OK).json(user);
