@@ -22,6 +22,11 @@ export default class AuthValidatorService {
         'Please enter your firstName, lastName, email, and password',
       );
     }
+    if (!validator.isStrongPassword(data.password)) {
+      throw new Error(
+        'Please enter a strong password having uppercase, lowercase, numbers and symbols',
+      );
+    }
   }
 
   /** @param {Record<string, any>} data */

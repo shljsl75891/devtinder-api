@@ -50,12 +50,6 @@ const userSchema = new Schema(
     password: {
       type: String,
       required: true,
-      validate: {
-        /** @param {string} val */
-        validator: val => validator.isStrongPassword(val),
-        message:
-          'Please enter a strong password having uppercase, lowercase, numbers and symbols',
-      },
     },
     age: {
       type: Number,
