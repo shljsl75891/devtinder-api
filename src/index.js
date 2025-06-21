@@ -3,6 +3,7 @@ import express from 'express';
 import connectDB from './config/database.js';
 import './config/environment.js';
 import authRouter from './routes/auth.router.js';
+import connectionRequestRouter from './routes/connection-request.router.js';
 import userRouter from './routes/user.router.js';
 import genericErrorHandler from './utils/error-handler.js';
 
@@ -16,6 +17,7 @@ app.use(cookieParser());
 // Routes
 app.use('/auth', authRouter);
 app.use('/users', userRouter);
+app.use('/connection-requests', connectionRequestRouter);
 
 // Error Handling
 app.use('/', genericErrorHandler);
