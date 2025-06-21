@@ -18,8 +18,8 @@ authRouter.post('/login', async (req, res) => {
     if (isPasswordCorrect) {
       // Expires the cookie one minute before JWT get expired
       const expires = new Date(Date.now() + HALF_HOUR_IN_MILLISECONDS - 60000);
-      res.cookie('token', user.createJWT(), {expires});
       res
+        .cookie('token', user.createJWT(), {expires})
         .status(STATUS_CODES.OK)
         .json({message: 'You have login successfully'});
     } else throw INVALID_CREDENTIALS_ERROR;
@@ -43,8 +43,15 @@ authRouter.post('/signup', async (req, res) => {
       .status(STATUS_CODES.CREATED)
       .json({message: 'You have registered successfully'});
   } catch (err) {
-    res.status(STATUS_CODES.UNPROCESSABLE_ENTITY).send({message: err.message});
+    res.status(STATUS_CODES.UNPROCESSABLE_ENTITY).json({message: err.message});
   }
+});
+
+authRouter.post('/logout', (req, res) => {
+  res
+    .clearCookie('token')
+    .status(STATUS_CODES.OK)
+    .json({message: 'You have logged out successfully'});
 });
 
 authRouter.use(userAuth);
@@ -61,9 +68,9 @@ authRouter.patch('/forgot-password', async (req, res) => {
     }
     const passwordHash = await User.generatePasswordHash(newPassword);
     await User.findByIdAndUpdate(currentUser._id, {password: passwordHash});
-    res.status(STATUS_CODES.NO_CONTENT).json({
-      message: 'Password updated successfully',
-    });
+    res
+      .status(STATUS_CODES.NO_CONTENT)
+      .json({message: 'Password updated successfully'});
   } catch (error) {
     res.status(STATUS_CODES.UNAUTHORIZED).json({message: error.message});
   }

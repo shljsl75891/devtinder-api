@@ -30,7 +30,7 @@ userRouter.patch('/update-profile', async (req, res) => {
       res.status(STATUS_CODES.NOT_FOUND).json({message: 'User Not Found'});
     else res.sendStatus(STATUS_CODES.NO_CONTENT);
   } catch (err) {
-    res.status(STATUS_CODES.UNPROCESSABLE_ENTITY).send({message: err.message});
+    res.status(STATUS_CODES.UNPROCESSABLE_ENTITY).json({message: err.message});
   }
 });
 
