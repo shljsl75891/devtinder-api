@@ -11,3 +11,8 @@ export const HALF_HOUR_IN_MILLISECONDS = 1000 * 60 * 30;
 export const genericErrorHandler = (err, _1, res, _2) => {
   res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message: err.message});
 };
+
+/** @param {unknown} val
+ * @returns {val is null | undefined}
+ */
+export const isNullOrUndefined = val => val === null || val === undefined;
