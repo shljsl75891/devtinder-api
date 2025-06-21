@@ -24,11 +24,9 @@ userRouter.patch('/update-profile', async (req, res) => {
     const user = await User.findByIdAndUpdate(
       res.locals.currentUser._id,
       {profileImageUrl, skills},
-      {runValidators: true},
+      {returnDocument: 'after', runValidators: true},
     );
-    if (!user)
-      res.status(STATUS_CODES.NOT_FOUND).json({message: 'User Not Found'});
-    else res.sendStatus(STATUS_CODES.NO_CONTENT);
+    res.status(STATUS_CODES.OK).json(user);
   } catch (err) {
     res.status(STATUS_CODES.UNPROCESSABLE_ENTITY).json({message: err.message});
   }
