@@ -1,5 +1,6 @@
 import {Router} from 'express';
 import userAuth from '../middlewares/auth.middleware.js';
+import Request from '../models/request.model.js';
 import User from '../models/user.model.js';
 import UserValidatorService from '../services/validators/user-validator.service.js';
 import {STATUS_CODES} from '../utils/index.js';
@@ -33,7 +34,11 @@ userRouter.patch('/update-profile', async (req, res) => {
 });
 
 userRouter.delete('/delete-account', async (req, res) => {
-  const user = await User.findByIdAndDelete(res.locals.currentUser._id);
+  const currentUser = res.locals.currentUser._id;
+  await Request.deleteMany({
+    $or: [{sender: currentUser._id}, {receiver: currentUser._id}],
+  });
+  const user = await User.findByIdAndDelete(currentUser._id);
   if (!user)
     res.status(STATUS_CODES.NOT_FOUND).json({message: 'User Not Found'});
   else res.sendStatus(STATUS_CODES.NO_CONTENT);
