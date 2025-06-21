@@ -1,5 +1,8 @@
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import {model, Schema} from 'mongoose';
 import validator from 'validator';
+import {HALF_HOUR_IN_MILLISECONDS} from '../constants.js';
 import {Gender} from '../enum.js';
 
 const userSchema = new Schema(
@@ -36,6 +39,7 @@ const userSchema = new Schema(
       required: true,
       default: process.env.DEFAULT_PROFILE_IMAGE_URL,
       validate: {
+        /** @param {string} val */
         validator: val => validator.isURL(val),
         message: 'Please upload a valid image URL',
       },
@@ -44,6 +48,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
       validate: {
+        /** @param {string} val */
         validator: val => validator.isStrongPassword(val),
         message:
           'Please enter a strong password having uppercase, lowercase, numbers and symbols',
@@ -56,14 +61,36 @@ const userSchema = new Schema(
     skills: {
       type: [String],
       validate: {
+        /** @param {Array<string>} vals */
         validator: vals => vals.length >= 0 && vals.length <= 50,
         message: 'The number of skills must be less than or equal to 50',
       },
     },
   },
-  {timestamps: true},
+  {
+    methods: {
+      /**
+       * Validates the password sent in the payload
+       * @param {string} passwordInputByUser
+       * @returns {Promise<boolean>}
+       */
+      validatePassword: function (passwordInputByUser) {
+        const passwordHash = this.password;
+        return bcrypt.compare(passwordInputByUser, passwordHash);
+      },
+      /**
+       * Creates a Auth JWT token with _id of the user
+       * @returns {string}
+       */
+      createJWT: function () {
+        return jwt.sign({_id: this._id}, process.env.JWT_SECRET, {
+          expiresIn: HALF_HOUR_IN_MILLISECONDS / 1000,
+        });
+      },
+    },
+    timestamps: true,
+  },
 );
 
 const User = model('User', userSchema);
-
 export default User;
