@@ -1,6 +1,4 @@
-import bcrypt from 'bcrypt';
 import {Router} from 'express';
-import {SALT_ROUNDS} from '../constants.js';
 import userAuth from '../middlewares/auth.middleware.js';
 import User from '../models/user.model.js';
 import {STATUS_CODES} from '../status-codes.js';
@@ -21,11 +19,10 @@ userRouter.get('/profile', async (req, res) => {
 userRouter.patch('/update-profile', async (req, res) => {
   try {
     validateProfileUpdate(req.body);
-    const {profileImageUrl, password, skills} = req.body;
-    const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+    const {profileImageUrl, skills} = req.body;
     const user = await User.findByIdAndUpdate(
       res.locals.currentUser._id,
-      {profileImageUrl, password: passwordHash, skills},
+      {profileImageUrl, skills},
       {runValidators: true},
     );
     if (!user)

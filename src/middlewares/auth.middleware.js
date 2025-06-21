@@ -2,7 +2,9 @@ import jwt from 'jsonwebtoken';
 import User from '../models/user.model.js';
 import {STATUS_CODES} from '../status-codes.js';
 
-const INVALID_TOKEN_ERROR = {message: 'Invalid Token'};
+const INVALID_TOKEN_ERROR = {
+  message: 'Invalid Token. Please login and try again',
+};
 
 /**
  * The middleware responsible for authenticating the JWT token

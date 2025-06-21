@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import {model, Schema} from 'mongoose';
 import validator from 'validator';
-import {HALF_HOUR_IN_MILLISECONDS} from '../constants.js';
+import {HALF_HOUR_IN_MILLISECONDS, SALT_ROUNDS} from '../constants.js';
 import {Gender} from '../enum.js';
 
 const userSchema = new Schema(
@@ -68,6 +68,15 @@ const userSchema = new Schema(
     },
   },
   {
+    statics: {
+      /**
+       * @param {string} passwordInputByUser
+       * Generates a password hash for the user to store
+       */
+      generatePasswordHash: function (passwordInputByUser) {
+        return bcrypt.hash(passwordInputByUser, SALT_ROUNDS);
+      },
+    },
     methods: {
       /**
        * Validates the password sent in the payload
