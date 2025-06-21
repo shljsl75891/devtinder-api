@@ -24,7 +24,10 @@ const userSchema = new Schema(
     },
     gender: {
       type: Number,
-      enum: Object.values(Gender),
+      enum: {
+        values: Object.values(Gender),
+        message: '{VALUE} is not a valid gender',
+      },
     },
     email: {
       type: String,

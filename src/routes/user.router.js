@@ -20,10 +20,10 @@ userRouter.get('/profile', async (req, res) => {
 userRouter.patch('/update-profile', async (req, res) => {
   try {
     userValidator.updateProfile(req.body);
-    const {profileImageUrl, skills} = req.body;
+    const {gender, age, profileImageUrl, skills} = req.body;
     const user = await User.findByIdAndUpdate(
       res.locals.currentUser._id,
-      {profileImageUrl, skills},
+      {gender, age, profileImageUrl, skills},
       {returnDocument: 'after', runValidators: true},
     );
     res.status(STATUS_CODES.OK).json(user);
