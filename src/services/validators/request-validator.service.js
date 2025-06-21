@@ -1,5 +1,16 @@
 import {RequestStatus} from '../../utils/enum.js';
 
+/** @type {number[]} */
+export const ACCEPTED_REJECTED_STATUSES = [
+  RequestStatus.Accepted,
+  RequestStatus.Rejected,
+];
+/** @type {number[]} */
+export const INTERESTED_IGNORED_STATUSES = [
+  RequestStatus.Interested,
+  RequestStatus.Ignored,
+];
+
 /**
  * @typedef SendPayload
  * @property {string} status
@@ -22,9 +33,7 @@ export default class RequestValidatorService {
       );
     }
     const {status} = params;
-    /** @type {number[]} */
-    const ALLOWED_STATUSES = [RequestStatus.Interested, RequestStatus.Ignored];
-    if (!ALLOWED_STATUSES.includes(+status)) {
+    if (!INTERESTED_IGNORED_STATUSES.includes(+status)) {
       throw new Error(
         'Please choose to either ignore or show interest in the user.',
       );
@@ -33,9 +42,7 @@ export default class RequestValidatorService {
 
   /** @param {ReviewPayload} params  */
   review(params) {
-    /** @type {number[]} */
-    const ALLOWED_STATUSES = [RequestStatus.Accepted, RequestStatus.Rejected];
-    if (!ALLOWED_STATUSES.includes(+params.status)) {
+    if (!ACCEPTED_REJECTED_STATUSES.includes(+params.status)) {
       throw new Error('Please choose to either accept or reject the request.');
     }
   }

@@ -11,6 +11,22 @@ const requestRouter = Router();
 const requestValidator = new RequestValidatorService();
 requestRouter.use(userAuth);
 
+requestRouter.get('/participated', async (req, res) => {
+  try {
+    const currentUserId = res.locals.currentUser._id.toString();
+    const requests = await Request.find({
+      $or: [{sender: currentUserId}, {receiver: currentUserId}],
+    })
+      .populate('sender', 'firstName lastName')
+      .populate('receiver', 'firstName lastName');
+    res.status(STATUS_CODES.OK).json(requests);
+  } catch (error) {
+    res
+      .status(STATUS_CODES.UNPROCESSABLE_ENTITY)
+      .json({message: error.message});
+  }
+});
+
 requestRouter.get('/received', async (req, res) => {
   try {
     const requests = await Request.find({
