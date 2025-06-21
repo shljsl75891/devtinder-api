@@ -1,10 +1,11 @@
 import {Router} from 'express';
 import userAuth from '../middlewares/auth.middleware.js';
 import User from '../models/user.model.js';
-import {STATUS_CODES} from '../status-codes.js';
-import {validateProfileUpdate} from '../utils/index.js';
+import UserValidatorService from '../services/validators/user-validator.service.js';
+import {STATUS_CODES} from '../utils/index.js';
 
 const userRouter = Router();
+const userValidator = new UserValidatorService();
 userRouter.use(userAuth);
 
 userRouter.get('/feed', async (req, res) => {
@@ -18,7 +19,7 @@ userRouter.get('/profile', async (req, res) => {
 
 userRouter.patch('/update-profile', async (req, res) => {
   try {
-    validateProfileUpdate(req.body);
+    userValidator.updateProfile(req.body);
     const {profileImageUrl, skills} = req.body;
     const user = await User.findByIdAndUpdate(
       res.locals.currentUser._id,

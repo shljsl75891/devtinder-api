@@ -2,8 +2,11 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import {model, Schema} from 'mongoose';
 import validator from 'validator';
-import {HALF_HOUR_IN_MILLISECONDS, SALT_ROUNDS} from '../constants.js';
-import {Gender} from '../enum.js';
+import {
+  Gender,
+  HALF_HOUR_IN_MILLISECONDS,
+  SALT_ROUNDS,
+} from '../utils/index.js';
 
 const userSchema = new Schema(
   {

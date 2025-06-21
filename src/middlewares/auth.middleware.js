@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/user.model.js';
-import {STATUS_CODES} from '../status-codes.js';
+import {STATUS_CODES} from '../utils/index.js';
 
 const INVALID_TOKEN_ERROR = {
   message: 'Invalid Token. Please login and try again',

@@ -1,20 +1,16 @@
 import express from 'express';
-import {HALF_HOUR_IN_MILLISECONDS} from '../constants.js';
 import userAuth from '../middlewares/auth.middleware.js';
 import User from '../models/user.model.js';
-import {STATUS_CODES} from '../status-codes.js';
-import {
-  forgotPasswordPayload,
-  validateUserLogin,
-  validateUserSignup,
-} from '../utils/index.js';
+import AuthValidatorService from '../services/validators/auth-validator.service.js';
+import {HALF_HOUR_IN_MILLISECONDS, STATUS_CODES} from '../utils/index.js';
 
 const authRouter = express.Router();
+const authValidator = new AuthValidatorService();
 const INVALID_CREDENTIALS_ERROR = new Error('Invalid Credentials');
 
 authRouter.post('/login', async (req, res) => {
   try {
-    validateUserLogin(req.body);
+    authValidator.login(req.body);
     const {email, password} = req.body;
     const user = await User.findOne({email}, 'email password');
     if (!user) throw INVALID_CREDENTIALS_ERROR;
@@ -34,7 +30,7 @@ authRouter.post('/login', async (req, res) => {
 
 authRouter.post('/signup', async (req, res) => {
   try {
-    validateUserSignup(req.body);
+    authValidator.signUp(req.body);
     const {firstName, lastName, email, password} = req.body;
     const passwordHash = await User.generatePasswordHash(password);
     await User.create({
@@ -55,7 +51,7 @@ authRouter.use(userAuth);
 authRouter.patch('/forgot-password', async (req, res) => {
   try {
     const currentUser = res.locals.currentUser;
-    forgotPasswordPayload(req.body);
+    authValidator.forgotPassword(req.body);
     const {currentPassword, newPassword} = req.body;
     const user = await User.findById(currentUser._id, 'password');
     const isCurrentPasswordCorrect =
