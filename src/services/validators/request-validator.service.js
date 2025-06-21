@@ -21,16 +21,13 @@ export default class RequestValidatorService {
         'Please send correct payload having `status` and `receiver`',
       );
     }
-    const {status, sender, receiver} = params;
+    const {status} = params;
     /** @type {number[]} */
     const ALLOWED_STATUSES = [RequestStatus.Interested, RequestStatus.Ignored];
     if (!ALLOWED_STATUSES.includes(+status)) {
       throw new Error(
         'Please choose to either ignore or show interest in the user.',
       );
-    }
-    if (sender === receiver) {
-      throw new Error('You cannot send connection request to yourself');
     }
   }
 

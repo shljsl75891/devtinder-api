@@ -27,5 +27,11 @@ const requestSchema = new Schema(
 
 requestSchema.index({sender: 1, receiver: 1}, {unique: true});
 
+requestSchema.pre('save', function (next) {
+  if (this.sender.equals(this.receiver))
+    throw new Error('A user cannot send connection request to itself');
+  next();
+});
+
 const Request = model('Request', requestSchema);
 export default Request;
