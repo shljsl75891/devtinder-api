@@ -38,6 +38,26 @@ const requestSchema = new Schema(
           ],
         });
       },
+      /**
+       * Finds all accepted connection requests for a given user, and
+       * and return the array users which are connected to the given user
+       *
+       * @param {string} userId - The ID of the user whose connections are to be retrieved.
+       */
+      async findConnections(userId) {
+        const projections = 'firstName lastName skills profileImageUrl gender';
+        const acceptedRequests = await this.find({
+          status: {$eq: RequestStatus.Accepted},
+          $or: [{sender: userId}, {receiver: userId}],
+        })
+          .populate('sender', projections)
+          .populate('receiver', projections);
+        return acceptedRequests.map(req => {
+          return req.sender._id.toString() === userId
+            ? req.receiver
+            : req.sender;
+        });
+      },
     },
     methods: {},
     timestamps: true,

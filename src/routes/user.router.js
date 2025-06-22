@@ -40,4 +40,10 @@ userRouter.delete('/delete-account', async (req, res) => {
   res.sendStatus(STATUS_CODES.NO_CONTENT);
 });
 
+userRouter.get('/connections', async (req, res) => {
+  const currentUserId = res.locals.currentUser._id.toString();
+  const connections = await Request.findConnections(currentUserId);
+  res.status(STATUS_CODES.OK).json(connections);
+});
+
 export default userRouter;
