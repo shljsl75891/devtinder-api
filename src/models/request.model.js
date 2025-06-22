@@ -22,7 +22,26 @@ const requestSchema = new Schema(
       },
     },
   },
-  {statics: {}, methods: {}, timestamps: true},
+  {
+    statics: {
+      /**
+       * Finds a mutual request between two users regardless of direction.
+       *
+       * @param {string} sender - ID of the first user
+       * @param {string} receiver - ID of the second user
+       */
+      findOneMutualRequest(sender, receiver) {
+        return this.findOne({
+          $or: [
+            {sender, receiver},
+            {sender: receiver, receiver: sender},
+          ],
+        });
+      },
+    },
+    methods: {},
+    timestamps: true,
+  },
 );
 
 requestSchema.index({sender: 1, receiver: 1}, {unique: true});

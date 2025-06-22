@@ -20,7 +20,7 @@ app.use('/users', userRouter);
 app.use('/requests', requestRouter);
 
 // Error Handling
-app.use('/', genericErrorHandler);
+app.use(genericErrorHandler);
 
 connectDB()
   .then(() => {

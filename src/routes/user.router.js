@@ -3,7 +3,7 @@ import userAuth from '../middlewares/auth.middleware.js';
 import Request from '../models/request.model.js';
 import User from '../models/user.model.js';
 import UserValidatorService from '../services/validators/user-validator.service.js';
-import {STATUS_CODES} from '../utils/index.js';
+import {CustomError, STATUS_CODES} from '../utils/index.js';
 
 const userRouter = Router();
 const userValidator = new UserValidatorService();
@@ -19,18 +19,14 @@ userRouter.get('/profile', async (req, res) => {
 });
 
 userRouter.patch('/update-profile', async (req, res) => {
-  try {
-    userValidator.updateProfile(req.body);
-    const {gender, age, profileImageUrl, skills} = req.body;
-    const user = await User.findByIdAndUpdate(
-      res.locals.currentUser._id,
-      {gender, age, profileImageUrl, skills},
-      {returnDocument: 'after', runValidators: true},
-    );
-    res.status(STATUS_CODES.OK).json(user);
-  } catch (err) {
-    res.status(STATUS_CODES.UNPROCESSABLE_ENTITY).json({message: err.message});
-  }
+  userValidator.updateProfile(req.body);
+  const {gender, age, profileImageUrl, skills} = req.body;
+  const user = await User.findByIdAndUpdate(
+    res.locals.currentUser._id,
+    {gender, age, profileImageUrl, skills},
+    {returnDocument: 'after', runValidators: true},
+  );
+  res.status(STATUS_CODES.OK).json(user);
 });
 
 userRouter.delete('/delete-account', async (req, res) => {
@@ -40,8 +36,8 @@ userRouter.delete('/delete-account', async (req, res) => {
   });
   const user = await User.findByIdAndDelete(currentUser._id);
   if (!user)
-    res.status(STATUS_CODES.NOT_FOUND).json({message: 'User Not Found'});
-  else res.sendStatus(STATUS_CODES.NO_CONTENT);
+    throw new CustomError("User doesn't exists", STATUS_CODES.NOT_FOUND);
+  res.sendStatus(STATUS_CODES.NO_CONTENT);
 });
 
 export default userRouter;
