@@ -8,7 +8,6 @@ import userRouter from './routes/user.router.js';
 import {genericErrorHandler} from './utils/index.js';
 
 const app = express();
-const PORT = +(process.env.PORT ?? 3400);
 
 // Middlewares
 app.use(express.json());
@@ -25,10 +24,15 @@ app.use(genericErrorHandler);
 connectDB()
   .then(() => {
     console.info('Database connection established');
-    app.listen(PORT, () => {
-      console.info(`The server is running on: ${PORT}`);
-    });
+    if (process.env.NODE_ENV === 'dev') {
+      const PORT = +(process.env.PORT ?? 3400);
+      app.listen(PORT, () => {
+        console.info(`The server is running on: ${PORT}`);
+      });
+    }
   })
   .catch(err => {
     console.error(`Database connection failed: ${err}`);
   });
+
+export default app;
