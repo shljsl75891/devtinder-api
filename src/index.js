@@ -24,7 +24,7 @@ app.use(genericErrorHandler);
 connectDB()
   .then(() => {
     console.info('Database connection established');
-    if (process.env.NODE_ENV === 'dev') {
+    if (process.env.NODE_ENV !== 'lambda') {
       const PORT = +(process.env.PORT ?? 3400);
       app.listen(PORT, () => {
         console.info(`The server is running on: ${PORT}`);

@@ -20,7 +20,37 @@ userRouter.get('/feed', async (req, res) => {
     'sender receiver',
   );
 
-  const filterQuery = {
+  const users = await User.find(
+    {
+      _id: {
+        $nin: Array.from(
+          requests.reduce(
+            (userIds, request) => {
+              userIds.add(request.sender.toString());
+              userIds.add(request.receiver.toString());
+              return userIds;
+            },
+            new Set([currentUserId]),
+          ),
+        ),
+      },
+    },
+    USER_SAFE_DATA,
+  )
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  res.status(STATUS_CODES.OK).json(users);
+});
+
+userRouter.get('/feed/count', async (req, res) => {
+  const currentUserId = res.locals.currentUser._id.toString();
+  const requests = await Request.find(
+    {$or: [{sender: currentUserId}, {receiver: currentUserId}]},
+    'sender receiver',
+  );
+
+  const count = await User.countDocuments({
     _id: {
       $nin: Array.from(
         requests.reduce(
@@ -33,15 +63,9 @@ userRouter.get('/feed', async (req, res) => {
         ),
       ),
     },
-  };
+  });
 
-  const [count, users] = await Promise.all([
-    User.countDocuments(filterQuery),
-    User.find(filterQuery, USER_SAFE_DATA)
-      .skip((page - 1) * limit)
-      .limit(limit),
-  ]);
-  res.status(STATUS_CODES.OK).json({count, users});
+  res.status(STATUS_CODES.OK).json({count});
 });
 
 userRouter.get('/profile', async (req, res) => {
