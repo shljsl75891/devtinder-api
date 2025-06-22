@@ -56,9 +56,7 @@ requestRouter.patch('/review/:id/:status', async (req, res) => {
     await Request.updateOne({_id: req.params.id}, {status: req.params.status});
     res.sendStatus(STATUS_CODES.NO_CONTENT);
   } catch (error) {
-    res
-      .status(STATUS_CODES.UNPROCESSABLE_ENTITY)
-      .json({message: error.message});
+    res.status(STATUS_CODES.NOT_FOUND).json({message: error.message});
   }
 });
 
