@@ -10,35 +10,38 @@ const userValidator = new UserValidatorService();
 userRouter.use(userAuth);
 
 userRouter.get('/feed', async (req, res) => {
+  const MAX_LIMIT = 50;
   const currentUserId = res.locals.currentUser._id.toString();
-  const offset = req.query.skip ? +req.query.skip : 0;
-  const limit = req.query.limit ? +req.query.limit : 5;
+  const page = req.query.page ? +req.query.page : 1;
+  let limit = req.query.limit ? +req.query.limit : 10;
+  limit = limit > MAX_LIMIT ? MAX_LIMIT : limit;
   const requests = await Request.find(
     {$or: [{sender: currentUserId}, {receiver: currentUserId}]},
     'sender receiver',
   );
 
-  const feedUsers = await User.find(
-    {
-      _id: {
-        $nin: Array.from(
-          requests.reduce(
-            (userIds, request) => {
-              userIds.add(request.sender.toString());
-              userIds.add(request.receiver.toString());
-              return userIds;
-            },
-            new Set([currentUserId]),
-          ),
+  const filterQuery = {
+    _id: {
+      $nin: Array.from(
+        requests.reduce(
+          (userIds, request) => {
+            userIds.add(request.sender.toString());
+            userIds.add(request.receiver.toString());
+            return userIds;
+          },
+          new Set([currentUserId]),
         ),
-      },
+      ),
     },
-    USER_SAFE_DATA,
-  )
-    .skip(offset)
-    .limit(limit);
+  };
 
-  res.status(STATUS_CODES.OK).json(feedUsers);
+  const [count, users] = await Promise.all([
+    User.countDocuments(filterQuery),
+    User.find(filterQuery, USER_SAFE_DATA)
+      .skip((page - 1) * limit)
+      .limit(limit),
+  ]);
+  res.status(STATUS_CODES.OK).json({count, users});
 });
 
 userRouter.get('/profile', async (req, res) => {
