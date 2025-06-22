@@ -3,15 +3,42 @@ import userAuth from '../middlewares/auth.middleware.js';
 import Request from '../models/request.model.js';
 import User from '../models/user.model.js';
 import UserValidatorService from '../services/validators/user-validator.service.js';
-import {CustomError, STATUS_CODES} from '../utils/index.js';
+import {CustomError, STATUS_CODES, USER_SAFE_DATA} from '../utils/index.js';
 
 const userRouter = Router();
 const userValidator = new UserValidatorService();
 userRouter.use(userAuth);
 
 userRouter.get('/feed', async (req, res) => {
-  const users = await User.find({}, {__v: 0, password: 0});
-  res.status(STATUS_CODES.OK).json(users);
+  const currentUserId = res.locals.currentUser._id.toString();
+  const offset = req.query.skip ? +req.query.skip : 0;
+  const limit = req.query.limit ? +req.query.limit : 5;
+  const requests = await Request.find(
+    {$or: [{sender: currentUserId}, {receiver: currentUserId}]},
+    'sender receiver',
+  );
+
+  const feedUsers = await User.find(
+    {
+      _id: {
+        $nin: Array.from(
+          requests.reduce(
+            (userIds, request) => {
+              userIds.add(request.sender.toString());
+              userIds.add(request.receiver.toString());
+              return userIds;
+            },
+            new Set([currentUserId]),
+          ),
+        ),
+      },
+    },
+    USER_SAFE_DATA,
+  )
+    .skip(offset)
+    .limit(limit);
+
+  res.status(STATUS_CODES.OK).json(feedUsers);
 });
 
 userRouter.get('/profile', async (req, res) => {
@@ -20,10 +47,10 @@ userRouter.get('/profile', async (req, res) => {
 
 userRouter.patch('/update-profile', async (req, res) => {
   userValidator.updateProfile(req.body);
-  const {gender, age, profileImageUrl, skills} = req.body;
+  const {gender, age, profileImageUrl, skills, about} = req.body;
   const user = await User.findByIdAndUpdate(
     res.locals.currentUser._id,
-    {gender, age, profileImageUrl, skills},
+    {gender, age, profileImageUrl, skills, about},
     {returnDocument: 'after', runValidators: true},
   );
   res.status(STATUS_CODES.OK).json(user);

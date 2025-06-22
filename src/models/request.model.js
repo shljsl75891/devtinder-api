@@ -1,4 +1,5 @@
 import {model, Schema} from 'mongoose';
+import {USER_SAFE_DATA} from '../utils/constants.js';
 import {RequestStatus} from '../utils/enum.js';
 
 const requestSchema = new Schema(
@@ -45,13 +46,12 @@ const requestSchema = new Schema(
        * @param {string} userId - The ID of the user whose connections are to be retrieved.
        */
       async findConnections(userId) {
-        const projections = 'firstName lastName skills profileImageUrl gender';
         const acceptedRequests = await this.find({
           status: {$eq: RequestStatus.Accepted},
           $or: [{sender: userId}, {receiver: userId}],
         })
-          .populate('sender', projections)
-          .populate('receiver', projections);
+          .populate('sender', USER_SAFE_DATA)
+          .populate('receiver', USER_SAFE_DATA);
         return acceptedRequests.map(req => {
           return req.sender._id.toString() === userId
             ? req.receiver

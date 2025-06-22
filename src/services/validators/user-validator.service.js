@@ -9,6 +9,7 @@ export default class UserValidatorService {
       'age',
       'profileImageUrl',
       'skills',
+      'about',
     ];
     const payloadKeys = Object.keys(data);
     if (payloadKeys.includes('password')) {

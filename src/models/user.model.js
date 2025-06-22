@@ -58,6 +58,13 @@ const userSchema = new Schema(
       type: Number,
       min: [18, 'User must be atleast 18 years old'],
     },
+    about: {
+      type: String,
+      maxlength: [
+        250,
+        'The about section must contain maximum of 250 characters',
+      ],
+    },
     skills: {
       type: [String],
       validate: {
