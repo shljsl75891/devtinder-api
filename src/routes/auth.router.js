@@ -25,7 +25,12 @@ authRouter.post('/login', async (req, res) => {
   // Expires the cookie one minute before JWT get expired
   const expires = new Date(Date.now() + HALF_HOUR_IN_MILLISECONDS - 60000);
   res
-    .cookie('token', user.createJWT(), {expires})
+    .cookie('token', user.createJWT(), {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      expires,
+    })
     .status(STATUS_CODES.OK)
     .json({message: 'You have login successfully'});
 });
@@ -47,7 +52,7 @@ authRouter.post('/signup', async (req, res) => {
 
 authRouter.post('/logout', (req, res) => {
   res
-    .clearCookie('token')
+    .clearCookie('token', {sameSite: 'none', secure: true, httpOnly: true})
     .status(STATUS_CODES.OK)
     .json({message: 'You have logged out successfully'});
 });

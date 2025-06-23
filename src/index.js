@@ -1,4 +1,5 @@
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import express from 'express';
 import connectDB from './config/database.js';
 import './config/environment.js';
@@ -12,6 +13,14 @@ const app = express();
 // Middlewares
 app.use(express.json());
 app.use(cookieParser());
+if (process.env.NODE_ENV !== 'lambda') {
+  app.use(
+    cors({
+      origin: process.env.ALLOWED_ORIGINS?.split(','),
+      credentials: true,
+    }),
+  );
+}
 
 // Routes
 app.use('/auth', authRouter);
