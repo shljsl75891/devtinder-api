@@ -3,7 +3,7 @@ import userAuth from '../middlewares/auth.middleware.js';
 import Request from '../models/request.model.js';
 import User from '../models/user.model.js';
 import RequestValidatorService from '../services/validators/request-validator.service.js';
-import {isNullOrUndefined} from '../utils/constants.js';
+import {isNullOrUndefined, USER_SAFE_DATA} from '../utils/constants.js';
 import CustomError from '../utils/custom-error.js';
 import {RequestStatus} from '../utils/enum.js';
 import {STATUS_CODES} from '../utils/status-codes.js';
@@ -26,7 +26,7 @@ requestRouter.get('/received', async (req, res) => {
   const requests = await Request.find({
     status: {$eq: RequestStatus.Interested},
     receiver: {$eq: res.locals.currentUser._id},
-  }).populate('sender', 'firstName lastName');
+  }).populate('sender', USER_SAFE_DATA);
   res.status(STATUS_CODES.OK).json(requests);
 });
 

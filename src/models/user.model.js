@@ -60,6 +60,7 @@ const userSchema = new Schema(
     },
     about: {
       type: String,
+      default: "Hey there ! I am using Devtinder. Let's connect",
       maxlength: [
         250,
         'The about section must contain maximum of 250 characters',
