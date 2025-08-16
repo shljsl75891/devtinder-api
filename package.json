@@ -11,7 +11,7 @@
   },
   "scripts": {
     "start": "node ./src/index.js",
-    "dev": "nodemon ./src/index.js",
+    "dev": "nodemon --exec 'clear && node ./src/index.js'",
     "prettier:fix": "prettier --write \"**/*.js\""
   },
   "keywords": [],
@@ -27,6 +27,7 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.15.2",
+    "socket.io": "^4.8.1",
     "validator": "^13.15.15"
   },
   "devDependencies": {

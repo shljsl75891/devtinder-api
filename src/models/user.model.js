@@ -5,7 +5,9 @@ import validator from 'validator';
 import {
   Gender,
   HALF_HOUR_IN_MILLISECONDS,
+  INVALID_TOKEN_ERROR,
   SALT_ROUNDS,
+  USER_SAFE_DATA,
 } from '../utils/index.js';
 
 const userSchema = new Schema(
@@ -77,6 +79,15 @@ const userSchema = new Schema(
   },
   {
     statics: {
+      /** @param {string} token */
+      verifyJwt: async function (token) {
+        /** @type {object} */
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (!('_id' in decoded)) throw INVALID_TOKEN_ERROR;
+        const user = await this.findById(decoded._id, USER_SAFE_DATA);
+        if (!user) throw INVALID_TOKEN_ERROR;
+        return user;
+      },
       /**
        * @param {string} passwordInputByUser
        * Generates a password hash for the user to store
