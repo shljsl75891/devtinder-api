@@ -1,12 +1,12 @@
+import app from './app.js';
 import connectDB from './config/database.js';
-import server from './server.js';
 
 if (process.env.NODE_ENV !== 'lambda') {
   connectDB()
-    .then(() => {
+    .then(async () => {
       console.info('Database connection established');
       const PORT = +(process.env.PORT ?? 3400);
-      server.listen(PORT, () => {
+      app.listen(PORT, () => {
         console.info(`The server is running on: ${PORT}`);
       });
     })

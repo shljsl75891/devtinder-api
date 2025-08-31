@@ -4,8 +4,8 @@ import {model, Schema} from 'mongoose';
 import validator from 'validator';
 import {
   Gender,
-  HALF_HOUR_IN_MILLISECONDS,
   INVALID_TOKEN_ERROR,
+  ONE_DAY_IN_MILLISECONDS,
   SALT_ROUNDS,
   USER_SAFE_DATA,
 } from '../utils/index.js';
@@ -112,7 +112,7 @@ const userSchema = new Schema(
        */
       createJWT: function () {
         return jwt.sign({_id: this._id}, process.env.JWT_SECRET, {
-          expiresIn: HALF_HOUR_IN_MILLISECONDS / 1000,
+          expiresIn: ONE_DAY_IN_MILLISECONDS / 1000,
         });
       },
     },

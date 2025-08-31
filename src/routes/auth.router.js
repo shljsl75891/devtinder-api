@@ -4,7 +4,7 @@ import User from '../models/user.model.js';
 import AuthValidatorService from '../services/validators/auth-validator.service.js';
 import {
   CustomError,
-  HALF_HOUR_IN_MILLISECONDS,
+  ONE_DAY_IN_MILLISECONDS,
   STATUS_CODES,
 } from '../utils/index.js';
 
@@ -23,7 +23,7 @@ authRouter.post('/login', async (req, res) => {
   const isPasswordCorrect = await user.validatePassword(password);
   if (!isPasswordCorrect) throw INVALID_CREDENTIALS_ERROR;
   // Expires the cookie one minute before JWT get expired
-  const expires = new Date(Date.now() + HALF_HOUR_IN_MILLISECONDS - 60000);
+  const expires = new Date(Date.now() + ONE_DAY_IN_MILLISECONDS - 60000);
   res
     .cookie('token', user.createJWT(), {
       httpOnly: true,
